@@ -169,25 +169,28 @@
               </td>
               <td class="text-muted small">{{ o.created_at|localtime|date_medium }}</td>
               <td class="text-end">
-                <div class="dropdown actions-dropdown">
-                  <button class="btn btn-sm btn-outline-secondary actions-toggle" type="button" data-bs-toggle="dropdown" aria-label="More actions">
-                    <i class="fa fa-ellipsis-v"></i>
-                  </button>
-                  <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="{% url 'tracker:order_detail' pk=o.id %}"><i class="fa fa-eye me-2 text-primary"></i>View Details</a></li>
-                    <li><a class="dropdown-item" href="{% url 'tracker:order_edit' pk=o.id %}"><i class="fa fa-edit me-2 text-success"></i>Edit Order</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item js-complete-order" href="#" data-order-id="{{ o.id }}"><i class="fa fa-check me-2 text-success"></i>Mark Completed</a></li>
-                    <li><a class="dropdown-item js-cancel-order" href="#" data-order-id="{{ o.id }}"><i class="fa fa-times me-2 text-warning"></i>Cancel Order</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                      <form method="post" action="{% url 'tracker:order_delete' pk=o.id %}" onsubmit="return confirm('Delete this order?');">
-                        {% csrf_token %}
-                        <input type="hidden" name="next" value="{% url 'tracker:orders_list' %}">
-                        <button type="submit" class="dropdown-item text-danger"><i class="fa fa-trash me-2"></i>Delete Order</button>
-                      </form>
-                    </li>
-                  </ul>
+                <div class="table-actions btn-group btn-group-sm" role="group" aria-label="Actions">
+                  <a class="btn btn-icon btn-outline-secondary" href="{% url 'tracker:order_detail' pk=o.id %}" title="View" aria-label="View order">
+                    <i class="fa fa-eye"></i>
+                  </a>
+                  <a class="btn btn-icon btn-outline-primary" href="{% url 'tracker:order_edit' pk=o.id %}" title="Edit" aria-label="Edit order">
+                    <i class="fa fa-edit"></i>
+                  </a>
+                  <a class="btn btn-icon btn-outline-success js-complete-order" href="#" data-order-id="{{ o.id }}" title="Complete" aria-label="Mark completed">
+                    <i class="fa fa-check"></i>
+                  </a>
+                  <a class="btn btn-icon btn-outline-warning js-cancel-order" href="#" data-order-id="{{ o.id }}" title="Cancel" aria-label="Cancel order">
+                    <i class="fa fa-times"></i>
+                  </a>
+                  {% if user.is_superuser %}
+                  <form method="post" action="{% url 'tracker:order_delete' pk=o.id %}" onsubmit="return confirm('Delete this order?');" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'tracker:orders_list' %}">
+                    <button type="submit" class="btn btn-icon btn-outline-danger" title="Delete" aria-label="Delete order">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </form>
+                  {% endif %}
                 </div>
               </td>
             </tr>
