@@ -81,13 +81,6 @@
                 <a class="btn btn-outline-secondary" href="{% url 'tracker:customer_detail' customer.pk %}"><i class="fa fa-arrow-left me-1"></i>Back</a>
                 <button class="btn btn-primary" type="submit"><i class="fa fa-save me-1"></i>Save Changes</button>
               </div>
-
-              <div class="d-none">
-                {{ form.customer_type }}
-                {{ form.organization_name }}
-                {{ form.tax_number }}
-                {{ form.personal_subtype }}
-              </div>
             </form>
           </div>
         </div>
