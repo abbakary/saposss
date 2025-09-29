@@ -131,14 +131,24 @@
               <div class="text-center p-3 border rounded">
                 <i class="fa fa-file text-success mb-2 d-block"></i>
                 <small class="text-muted d-block mb-2">Completion Attachment</small>
-                {% with url=order.completion_attachment.url|lower %}
-                  {% if '.jpg' in url or '.jpeg' in url or '.png' in url or '.gif' in url or '.webp' in url %}
-                    <img src="{{ order.completion_attachment.url }}" alt="Attachment" class="img-fluid rounded shadow-sm" style="max-height: 150px;">
+                {% with fname=order.completion_attachment.name|lower url=order.completion_attachment.url %}
+                  {% if fname and ('.jpg' in fname or '.jpeg' in fname or '.png' in fname or '.gif' in fname or '.webp' in fname) %}
+                    <img src="{{ url }}" alt="Attachment" class="img-fluid rounded shadow-sm" style="max-height: 220px;">
+                  {% elif fname and '.pdf' in fname %}
+                    <div class="ratio ratio-4x3 mb-2"><iframe src="{{ url }}" title="PDF preview" style="border:0;border-radius:.5rem;"></iframe></div>
+                    <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm"><i class="fa fa-external-link me-1"></i>Open PDF</a>
+                  {% elif fname and ('.mp4' in fname or '.webm' in fname or '.ogg' in fname) %}
+                    <video controls class="w-100 rounded shadow-sm mb-2" style="max-height:240px;"><source src="{{ url }}"></video>
+                    <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm"><i class="fa fa-download me-1"></i>Download Video</a>
+                  {% elif fname and ('.mp3' in fname or '.wav' in fname or '.aac' in fname or '.m4a' in fname) %}
+                    <audio controls class="w-100 mb-2"><source src="{{ url }}"></audio>
+                    <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm"><i class="fa fa-download me-1"></i>Download Audio</a>
                   {% else %}
-                    <a href="{{ order.completion_attachment.url }}" target="_blank" class="btn btn-outline-success btn-sm">
+                    <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm">
                       <i class="fa fa-download me-1"></i>Download File
                     </a>
                   {% endif %}
+                  <div class="small text-muted mt-2">{{ order.completion_attachment.name }}</div>
                 {% endwith %}
               </div>
             </div>
