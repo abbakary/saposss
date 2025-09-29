@@ -435,14 +435,18 @@
         if(!j.success) return;
         const completeCard = document.getElementById('completeFormCard');
         const cancelCard = document.getElementById('cancelFormCard');
+        const sc = document.getElementById('showCompleteBtn');
+        const sk = document.getElementById('showCancelBtn');
         if(j.status==='completed' || j.status==='cancelled'){
           if(completeCard) completeCard.style.display = 'none';
           if(cancelCard) cancelCard.style.display = 'none';
-          const actionsCard = document.getElementById('orderActionsCard');
-          if(actionsCard) actionsCard.style.display = 'none';
+          if(sc) sc.disabled = true;
+          if(sk) sk.disabled = true;
         } else {
           if(completeCard && completeCard.classList.contains('d-none')===false) completeCard.style.display = '';
           if(cancelCard && cancelCard.classList.contains('d-none')===false) cancelCard.style.display = '';
+          if(sc) sc.disabled = false;
+          if(sk) sk.disabled = false;
         }
       });
   }
