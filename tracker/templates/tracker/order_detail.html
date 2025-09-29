@@ -452,6 +452,8 @@
         const cancelCard = document.getElementById('cancelFormCard');
         const sc = document.getElementById('showCompleteBtn');
         const sk = document.getElementById('showCancelBtn');
+        const badgeHost = document.getElementById('orderStatusBadge');
+        if(badgeHost){ badgeHost.innerHTML = statusBadge(j.status); }
         if(j.status==='completed' || j.status==='cancelled'){
           if(completeCard) completeCard.style.display = 'none';
           if(cancelCard) cancelCard.style.display = 'none';
