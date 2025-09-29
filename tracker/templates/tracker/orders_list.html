@@ -1,0 +1,301 @@
+{% extends 'tracker/base.html' %}
+{% load static custom_filters tz %}
+{% load date_filters %}
+
+{% block title %}Orders{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="page-title">
+    <div class="row">
+      <div class="col-6"><h4>Orders</h4></div>
+      <div class="col-6">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'tracker:dashboard' %}"><i class="fa fa-home"></i></a></li>
+          <li class="breadcrumb-item active">Orders</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-12">
+      <form method="get" class="card p-3">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              {% with s=status %}
+              <option value="all" {% if s == 'all' %}selected{% endif %}>All</option>
+              <option value="created" {% if s == 'created' %}selected{% endif %}>Start</option>
+              <option value="in_progress" {% if s == 'in_progress' %}selected{% endif %}>In Progress</option>
+              <option value="overdue" {% if s == 'overdue' %}selected{% endif %}>Overdue</option>
+              <option value="completed" {% if s == 'completed' %}selected{% endif %}>Completed</option>
+              <option value="cancelled" {% if s == 'cancelled' %}selected{% endif %}>Cancelled</option>
+              {% endwith %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Type</label>
+            <select name="type" class="form-select">
+              {% with t=type %}
+              <option value="all" {% if t == 'all' %}selected{% endif %}>All</option>
+              <option value="service" {% if t == 'service' %}selected{% endif %}>Service</option>
+              <option value="sales" {% if t == 'sales' %}selected{% endif %}>Sales</option>
+              <option value="inquiry" {% if t == 'inquiry' %}selected{% endif %}>Inquiry</option>
+              {% endwith %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Priority</label>
+            <select name="priority" class="form-select">
+              <option value="">Any</option>
+              <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
+              <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
+              <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
+              <option value="urgent" {% if request.GET.priority == 'urgent' %}selected{% endif %}>Urgent</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Date Range</label>
+            <select name="date_range" class="form-select">
+              {% with dr=request.GET.date_range|default:'' %}
+              <option value="">Any</option>
+              <option value="daily" {% if dr == 'daily' or dr == 'today' %}selected{% endif %}>Today</option>
+              <option value="weekly" {% if dr == 'weekly' or dr == 'week' %}selected{% endif %}>Last 7 days</option>
+              <option value="monthly" {% if dr == 'monthly' or dr == 'month' %}selected{% endif %}>Last 30 days</option>
+              <option value="yearly" {% if dr == 'yearly' or dr == 'year' %}selected{% endif %}>This year</option>
+              {% endwith %}
+            </select>
+          </div>
+          {% if user.is_superuser %}
+          <div class="col-md-2">
+            <label class="form-label">Branch (admin)</label>
+            <input type="number" name="branch" value="{{ request.GET.branch }}" class="form-control" placeholder="Branch ID">
+          </div>
+          {% endif %}
+          <div class="col-md-2 ms-auto">
+            <button class="btn btn-primary w-100" type="submit"><i class="fa fa-filter me-1"></i> Filter</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-3">
+      <div class="card"><div class="card-body d-flex justify-content-between"><span>Total Orders</span><span class="fw-bold">{{ total_orders }}</span></div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card"><div class="card-body d-flex justify-content-between"><span>Pending</span><span class="fw-bold">{{ pending_orders }}</span></div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card"><div class="card-body d-flex justify-content-between"><span>Active</span><span class="fw-bold">{{ active_orders }}</span></div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card"><div class="card-body d-flex justify-content-between"><span>Completed Today</span><span class="fw-bold">{{ completed_today }}</span></div></div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-white border-bottom">
+      <h5 class="card-title mb-0"><i class="fa fa-list me-2"></i>Orders List</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="fw-semibold">Order #</th>
+              <th class="fw-semibold">Customer</th>
+              <th class="fw-semibold">Type</th>
+              <th class="fw-semibold">Status</th>
+              <th class="fw-semibold">Priority</th>
+              <th class="fw-semibold">Created</th>
+              <th class="fw-semibold text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in orders %}
+            <tr>
+              <td>
+                <a href="{% url 'tracker:order_detail' pk=o.id %}" class="text-decoration-none fw-medium">
+                  {{ o.order_number }}
+                </a>
+              </td>
+              <td>
+                <a href="{% url 'tracker:customer_detail' pk=o.customer.id %}" class="text-decoration-none">
+                  {{ o.customer.full_name }}
+                </a>
+              </td>
+              <td>
+                {% if o.type == 'service' %}
+                  <span class="badge bg-primary rounded-pill"><i class="fa fa-wrench me-1"></i>Service</span>
+                {% elif o.type == 'sales' %}
+                  <span class="badge bg-success rounded-pill"><i class="fa fa-shopping-cart me-1"></i>Sales</span>
+                {% elif o.type == 'inquiry' %}
+                  <span class="badge bg-info rounded-pill"><i class="fa fa-question-circle me-1"></i>Inquiry</span>
+                {% else %}
+                  <span class="badge bg-secondary rounded-pill">{{ o.type }}</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if o.status == 'created' %}
+                  <span class="badge bg-secondary rounded-pill"><i class="fa fa-play me-1"></i>Start</span>
+                {% elif o.status == 'in_progress' %}
+                  <span class="badge bg-warning text-dark rounded-pill"><i class="fa fa-clock me-1"></i>In Progress</span>
+                {% elif o.status == 'overdue' %}
+                  <span class="badge bg-danger rounded-pill"><i class="fa fa-exclamation-triangle me-1"></i>Overdue</span>
+                {% elif o.status == 'completed' %}
+                  <span class="badge bg-success rounded-pill"><i class="fa fa-check me-1"></i>Completed</span>
+                {% elif o.status == 'cancelled' %}
+                  <span class="badge bg-dark rounded-pill"><i class="fa fa-times me-1"></i>Cancelled</span>
+                {% else %}
+                  <span class="badge bg-light text-dark rounded-pill">{{ o.status }}</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if o.priority == 'low' %}
+                  <span class="badge bg-light text-dark rounded-pill">Low</span>
+                {% elif o.priority == 'medium' %}
+                  <span class="badge bg-info text-dark rounded-pill">Medium</span>
+                {% elif o.priority == 'high' %}
+                  <span class="badge bg-warning text-dark rounded-pill">High</span>
+                {% elif o.priority == 'urgent' %}
+                  <span class="badge bg-danger rounded-pill"><i class="fa fa-fire me-1"></i>Urgent</span>
+                {% else %}
+                  <span class="badge bg-secondary rounded-pill">{{ o.priority }}</span>
+                {% endif %}
+              </td>
+              <td class="text-muted small">{{ o.created_at|localtime|date_medium }}</td>
+              <td class="text-end">
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fa fa-cog me-1"></i>Actions
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{% url 'tracker:order_detail' pk=o.id %}"><i class="fa fa-eye me-2 text-primary"></i>View Details</a></li>
+                    <li><a class="dropdown-item" href="{% url 'tracker:order_edit' pk=o.id %}"><i class="fa fa-edit me-2 text-success"></i>Edit Order</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item js-complete-order" href="#" data-order-id="{{ o.id }}"><i class="fa fa-check me-2 text-success"></i>Mark Completed</a></li>
+                    <li><a class="dropdown-item js-cancel-order" href="#" data-order-id="{{ o.id }}"><i class="fa fa-times me-2 text-warning"></i>Cancel Order</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                      <form method="post" action="{% url 'tracker:order_delete' pk=o.id %}" onsubmit="return confirm('Delete this order?');">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'tracker:orders_list' %}">
+                        <button type="submit" class="dropdown-item text-danger"><i class="fa fa-trash me-2"></i>Delete Order</button>
+                      </form>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">
+                <i class="fa fa-inbox fa-2x mb-2 d-block"></i>
+                No orders found
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-footer bg-light border-top-0">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="small text-muted">
+            <i class="fa fa-info-circle me-1"></i>
+            Page {{ orders.number }} of {{ orders.paginator.num_pages }}
+          </div>
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+              {% if orders.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page=1" title="First page">
+                  <i class="fa fa-angle-double-left"></i>
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ orders.previous_page_number }}" title="Previous page">
+                  <i class="fa fa-angle-left"></i> Prev
+                </a>
+              </li>
+              {% else %}
+              <li class="page-item disabled">
+                <span class="page-link"><i class="fa fa-angle-double-left"></i></span>
+              </li>
+              <li class="page-item disabled">
+                <span class="page-link"><i class="fa fa-angle-left"></i> Prev</span>
+              </li>
+              {% endif %}
+              
+              <li class="page-item active">
+                <span class="page-link">{{ orders.number }}</span>
+              </li>
+              
+              {% if orders.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ orders.next_page_number }}" title="Next page">
+                  Next <i class="fa fa-angle-right"></i>
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ orders.paginator.num_pages }}" title="Last page">
+                  <i class="fa fa-angle-double-right"></i>
+                </a>
+              </li>
+              {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">Next <i class="fa fa-angle-right"></i></span>
+              </li>
+              <li class="page-item disabled">
+                <span class="page-link"><i class="fa fa-angle-double-right"></i></span>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+      </div>
+  </div>
+
+<style>
+.dropdown-menu {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+.dropdown-item {
+  color: #212529;
+  background-color: transparent;
+}
+.dropdown-item:hover,
+.dropdown-item:focus {
+  color: #ffffff;
+  background-color: #0d6efd;
+}
+.dropdown-item.text-success:hover {
+  background-color: #198754;
+  color: #ffffff;
+}
+.dropdown-item.text-warning:hover {
+  background-color: #fd7e14;
+  color: #ffffff;
+}
+.dropdown-item.text-danger:hover {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+.dropdown-item.text-primary:hover {
+  background-color: #0d6efd;
+  color: #ffffff;
+}
+</style>
+{% endblock %} {# <-- Missing endblock was here #}
+
+{% block extra_js %}
+<script>
+  // your JavaScript code from before remains unchanged...
+</script>
+{% endblock %}
