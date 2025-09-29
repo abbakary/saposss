@@ -132,15 +132,15 @@
                 <i class="fa fa-file text-success mb-2 d-block"></i>
                 <small class="text-muted d-block mb-2">Completion Attachment</small>
                 {% with fname=order.completion_attachment.name|lower url=order.completion_attachment.url %}
-                  {% if fname and ('.jpg' in fname or '.jpeg' in fname or '.png' in fname or '.gif' in fname or '.webp' in fname) %}
+                  {% if (fname and '.jpg' in fname) or (fname and '.jpeg' in fname) or (fname and '.png' in fname) or (fname and '.gif' in fname) or (fname and '.webp' in fname) %}
                     <img src="{{ url }}" alt="Attachment" class="img-fluid rounded shadow-sm" style="max-height: 220px;">
                   {% elif fname and '.pdf' in fname %}
                     <div class="ratio ratio-4x3 mb-2"><iframe src="{{ url }}" title="PDF preview" style="border:0;border-radius:.5rem;"></iframe></div>
                     <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm"><i class="fa fa-external-link me-1"></i>Open PDF</a>
-                  {% elif fname and ('.mp4' in fname or '.webm' in fname or '.ogg' in fname) %}
+                  {% elif (fname and '.mp4' in fname) or (fname and '.webm' in fname) or (fname and '.ogg' in fname) %}
                     <video controls class="w-100 rounded shadow-sm mb-2" style="max-height:240px;"><source src="{{ url }}"></video>
                     <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm"><i class="fa fa-download me-1"></i>Download Video</a>
-                  {% elif fname and ('.mp3' in fname or '.wav' in fname or '.aac' in fname or '.m4a' in fname) %}
+                  {% elif (fname and '.mp3' in fname) or (fname and '.wav' in fname) or (fname and '.aac' in fname) or (fname and '.m4a' in fname) %}
                     <audio controls class="w-100 mb-2"><source src="{{ url }}"></audio>
                     <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm"><i class="fa fa-download me-1"></i>Download Audio</a>
                   {% else %}
