@@ -135,8 +135,9 @@
                   {% if fname and '.jpg' in fname or fname and '.jpeg' in fname or fname and '.png' in fname or fname and '.gif' in fname or fname and '.webp' in fname %}
                     <img src="{{ url }}" alt="Attachment" class="img-fluid rounded shadow-sm" style="max-height: 220px;">
                   {% elif fname and '.pdf' in fname %}
-                    <div class="ratio ratio-4x3 mb-2"><iframe src="{{ url }}" title="PDF preview" style="border:0;border-radius:.5rem;"></iframe></div>
-                    <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm"><i class="fa fa-external-link me-1"></i>Open PDF</a>
+                    <div class="mb-2"><i class="fa fa-file-pdf-o text-danger me-1"></i>PDF document</div>
+                    <a href="{{ url }}" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm"><i class="fa fa-external-link me-1"></i>Open PDF</a>
+                    <a href="{{ url }}" download class="btn btn-outline-secondary btn-sm ms-1"><i class="fa fa-download me-1"></i>Download</a>
                   {% elif fname and '.mp4' in fname or fname and '.webm' in fname or fname and '.ogg' in fname %}
                     <video controls class="w-100 rounded shadow-sm mb-2" style="max-height:240px;"><source src="{{ url }}"></video>
                     <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm"><i class="fa fa-download me-1"></i>Download Video</a>
