@@ -280,11 +280,13 @@
             <button id="showCompleteBtn" type="button" class="btn btn-success"><i class="fa fa-check me-2"></i>Complete Order</button>
             <button id="showCancelBtn" type="button" class="btn btn-outline-danger"><i class="fa fa-times me-2"></i>Cancel Order</button>
             {% endif %}
+            {% if user.is_superuser %}
             <form method="post" action="{% url 'tracker:order_delete' pk=order.id %}" onsubmit="return confirm('Delete this order?');">
               {% csrf_token %}
               <input type="hidden" name="next" value="{% url 'tracker:orders_list' %}">
               <button type="submit" class="btn btn-outline-danger"><i class="fa fa-trash me-2"></i>Delete Order</button>
             </form>
+            {% endif %}
           </div>
         </div>
       </div>
