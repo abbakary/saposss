@@ -603,11 +603,13 @@ class OrderForm(forms.ModelForm):
                         cleaned["brand"] = "Unbranded"
                     except InventoryItem.DoesNotExist:
                         self.add_error("item_name", "Selected item not found")
-            
+
             q = cleaned.get("quantity")
             if not q or q < 1:
                 self.add_error("quantity", "Quantity must be at least 1")
-                
+            # Always set tire_type to New (hidden field)
+            cleaned["tire_type"] = "New"
+
         elif t == "service":
             if not cleaned.get("description"):
                 self.add_error("description", "Problem description required for Service orders")
