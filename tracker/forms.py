@@ -552,16 +552,9 @@ class OrderForm(forms.ModelForm):
             self.fields["item_name"].widget = forms.Select(attrs={'class': 'form-select'}, choices=item_choices)
             self.fields["brand"].widget = forms.HiddenInput()
         
-        # Tire type choices
-        self.fields["tire_type"].widget = forms.Select(
-            attrs={'class': 'form-select'},
-            choices=[
-                ('', 'Select condition'),
-                ("New", "New"),
-                ("Used", "Used"),
-                ("Refurbished", "Refurbished")
-            ]
-        )
+        # Tire type is fixed to 'New' and hidden
+        self.fields["tire_type"].initial = "New"
+        self.fields["tire_type"].widget = forms.HiddenInput()
         
         # Inquiry type choices
         self.fields["inquiry_type"].widget = forms.Select(
@@ -625,7 +618,9 @@ class OrderForm(forms.ModelForm):
                 desc = cleaned.get("description") or ""
                 desc_services = "\nSelected services: " + ", ".join(dict(self.SERVICE_OPTIONS)[s] for s in services)
                 cleaned["description"] = (desc + desc_services).strip()
-                
+            # Always set tire_type to New (hidden field)
+            cleaned["tire_type"] = "New"
+
         elif t == "inquiry":
             if not cleaned.get("inquiry_type"):
                 self.add_error("inquiry_type", "Inquiry type is required")
