@@ -116,13 +116,7 @@
                 {% endif %}
             </div>
             
-            <div class="col-md-8">
-                <label class="form-label">{{ form.tire_type.label }}</label>
-                {{ form.tire_type }}
-                {% if form.tire_type.errors %}
-                <div class="text-danger f-12">{{ form.tire_type.errors|striptags }}</div>
-                {% endif %}
-            </div>
+            {{ form.tire_type }}
                {# Tire Service Add-ons #}
             <div class="col-12">
                 <div class="card border-warning">
