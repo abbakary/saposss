@@ -132,15 +132,16 @@
                 <i class="fa fa-file text-success mb-2 d-block"></i>
                 <small class="text-muted d-block mb-2">Completion Attachment</small>
                 {% with fname=order.completion_attachment.name|lower url=order.completion_attachment.url %}
-                  {% if (fname and '.jpg' in fname) or (fname and '.jpeg' in fname) or (fname and '.png' in fname) or (fname and '.gif' in fname) or (fname and '.webp' in fname) %}
+                  {% if fname and '.jpg' in fname or fname and '.jpeg' in fname or fname and '.png' in fname or fname and '.gif' in fname or fname and '.webp' in fname %}
                     <img src="{{ url }}" alt="Attachment" class="img-fluid rounded shadow-sm" style="max-height: 220px;">
                   {% elif fname and '.pdf' in fname %}
-                    <div class="ratio ratio-4x3 mb-2"><iframe src="{{ url }}" title="PDF preview" style="border:0;border-radius:.5rem;"></iframe></div>
-                    <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm"><i class="fa fa-external-link me-1"></i>Open PDF</a>
-                  {% elif (fname and '.mp4' in fname) or (fname and '.webm' in fname) or (fname and '.ogg' in fname) %}
+                    <div class="mb-2"><i class="fa fa-file-pdf-o text-danger me-1"></i>PDF document</div>
+                    <a href="{{ url }}" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm"><i class="fa fa-external-link me-1"></i>Open PDF</a>
+                    <a href="{{ url }}" download class="btn btn-outline-secondary btn-sm ms-1"><i class="fa fa-download me-1"></i>Download</a>
+                  {% elif fname and '.mp4' in fname or fname and '.webm' in fname or fname and '.ogg' in fname %}
                     <video controls class="w-100 rounded shadow-sm mb-2" style="max-height:240px;"><source src="{{ url }}"></video>
                     <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm"><i class="fa fa-download me-1"></i>Download Video</a>
-                  {% elif (fname and '.mp3' in fname) or (fname and '.wav' in fname) or (fname and '.aac' in fname) or (fname and '.m4a' in fname) %}
+                  {% elif fname and '.mp3' in fname or fname and '.wav' in fname or fname and '.aac' in fname or fname and '.m4a' in fname %}
                     <audio controls class="w-100 mb-2"><source src="{{ url }}"></audio>
                     <a href="{{ url }}" target="_blank" class="btn btn-outline-success btn-sm"><i class="fa fa-download me-1"></i>Download Audio</a>
                   {% else %}
@@ -279,11 +280,13 @@
             <button id="showCompleteBtn" type="button" class="btn btn-success"><i class="fa fa-check me-2"></i>Complete Order</button>
             <button id="showCancelBtn" type="button" class="btn btn-outline-danger"><i class="fa fa-times me-2"></i>Cancel Order</button>
             {% endif %}
+            {% if user.is_superuser %}
             <form method="post" action="{% url 'tracker:order_delete' pk=order.id %}" onsubmit="return confirm('Delete this order?');">
               {% csrf_token %}
               <input type="hidden" name="next" value="{% url 'tracker:orders_list' %}">
               <button type="submit" class="btn btn-outline-danger"><i class="fa fa-trash me-2"></i>Delete Order</button>
             </form>
+            {% endif %}
           </div>
         </div>
       </div>

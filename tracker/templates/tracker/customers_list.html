@@ -216,24 +216,16 @@
               </td>
               {% endif %}
               <td class="text-end">
-                <div class="dropdown actions-dropdown">
-                  <button class="btn btn-sm btn-outline-secondary actions-toggle" type="button" data-bs-toggle="dropdown" aria-label="More actions">
-                    <i class="fa fa-ellipsis-v"></i>
-                  </button>
-                  <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="{% url 'tracker:customer_detail' pk=c.id %}"><i class="fa fa-eye me-2 text-primary"></i>View Details</a></li>
-                    <li><a class="dropdown-item" href="{% url 'tracker:create_order_for_customer' pk=c.id %}"><i class="fa fa-plus me-2 text-success"></i>New Order</a></li>
-                    <li><a class="dropdown-item" href="{% url 'tracker:customer_edit' pk=c.id %}"><i class="fa fa-edit me-2 text-warning"></i>Edit Customer</a></li>
-                    {% if user.is_superuser or user.is_staff %}
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                      <form method="post" action="{% url 'tracker:customer_delete' pk=c.id %}" onsubmit="return confirm('Delete this customer?');">
-                        {% csrf_token %}
-                        <button type="submit" class="dropdown-item text-danger"><i class="fa fa-trash me-2"></i>Delete Customer</button>
-                      </form>
-                    </li>
-                    {% endif %}
-                  </ul>
+                <div class="table-actions btn-group btn-group-sm" role="group" aria-label="Actions">
+                  <a class="btn btn-icon btn-outline-secondary" href="{% url 'tracker:customer_detail' pk=c.id %}" title="View" aria-label="View customer"><i class="fa fa-eye"></i></a>
+                  <a class="btn btn-icon btn-outline-success" href="{% url 'tracker:create_order_for_customer' pk=c.id %}" title="New order" aria-label="Create order"><i class="fa fa-plus"></i></a>
+                  <a class="btn btn-icon btn-outline-primary" href="{% url 'tracker:customer_edit' pk=c.id %}" title="Edit" aria-label="Edit customer"><i class="fa fa-edit"></i></a>
+                  {% if user.is_superuser or user.is_staff %}
+                  <form method="post" action="{% url 'tracker:customer_delete' pk=c.id %}" onsubmit="return confirm('Delete this customer?');" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-icon btn-outline-danger" title="Delete" aria-label="Delete customer"><i class="fa fa-trash"></i></button>
+                  </form>
+                  {% endif %}
                 </div>
               </td>
             </tr>
